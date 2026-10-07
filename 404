@@ -1,0 +1,64 @@
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local KORBLOX_R6_MESH = "rbxassetid://101851696"
+local KORBLOX_R6_TEX  = "rbxassetid://101851254"
+
+local function applyR6Visuals(char)
+    if not char then return end
+
+    -- 1. Headless R6
+    local head = char:FindFirstChild("Head")
+    if head then
+        head.Transparency = 1
+        
+        local face = head:FindFirstChildOfClass("Decal")
+        if face then 
+            face.Transparency = 1 
+        end
+        
+        local mesh = head:FindFirstChildOfClass("SpecialMesh")
+        if mesh then
+            mesh.Scale = Vector3.new(0, 0, 0)
+        end
+    end
+
+    -- 2. Korblox Leg R6
+    local rightLeg = char:FindFirstChild("Right Leg")
+    if rightLeg then
+        rightLeg.Transparency = 1
+
+        local fakeLeg = char:FindFirstChild("R6KorbloxLeg")
+        if not fakeLeg then
+            fakeLeg = Instance.new("Part")
+            fakeLeg.Name = "R6KorbloxLeg"
+            fakeLeg.Size = Vector3.new(1, 2, 1)
+            fakeLeg.CanCollide = false
+            fakeLeg.Massless = true
+
+            local mesh = Instance.new("SpecialMesh")
+            mesh.MeshType = Enum.MeshType.FileMesh
+            mesh.MeshId = KORBLOX_R6_MESH
+            mesh.TextureId = KORBLOX_R6_TEX
+            mesh.Scale = Vector3.new(1, 1, 1)
+            mesh.Parent = fakeLeg
+
+            local weld = Instance.new("Weld")
+            weld.Name = "KorbloxWeld"
+            weld.Part0 = rightLeg
+            weld.Part1 = fakeLeg
+            weld.C0 = CFrame.new(0, 0, 0)
+            weld.Parent = fakeLeg
+
+            fakeLeg.Parent = char
+        end
+    end
+end
+
+RunService.RenderStepped:Connect(function()
+    local char = LocalPlayer.Character
+    if char then
+        applyR6Visuals(char)
+    end
+end)
